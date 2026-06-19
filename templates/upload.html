@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<h3>Upload an image</h3>
+<form action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data">
+  <input type="file" name="image" accept=".png,.jpg,.jpeg" required>
+  <button type="submit">Process</button>
+</form>
+
+{% if jobs %}
+  <h4>Your recent uploads</h4>
+  <table>
+    <thead>
+      <tr><th>ID</th><th>Defects</th><th>View</th></tr>
+    </thead>
+    <tbody>
+      {% for j in jobs %}
+        <tr>
+          <td>{{ j.id }}</td>
+          <td>{{ j.defect_count }}</td>
+          <td><a href="{{ url_for('results', job_id=j.id) }}">Open</a></td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endif %}
+{% endblock %}

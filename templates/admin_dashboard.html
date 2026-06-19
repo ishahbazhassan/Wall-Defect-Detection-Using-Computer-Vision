@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+
+<h2>👑 Admin Dashboard</h2>
+<p>Welcome, {{ current_user.email }}.</p>
+
+<!-- Stats Section -->
+<section class="grid" style="margin-bottom: 2rem;">
+  <article style="background:#dbeafe;">
+    <h3>Total Users</h3>
+    <p style="font-size:2rem; font-weight:bold;">{{ total_users }}</p>
+  </article>
+  <article style="background:#dcfce7;">
+    <h3>Total Jobs</h3>
+    <p style="font-size:2rem; font-weight:bold;">{{ total_jobs }}</p>
+  </article>
+</section>
+
+<!-- Chart Section -->
+<article>
+  <header>
+    <h3>📊 Uploads per User</h3>
+  </header>
+  <canvas id="uploadsChart" height="120"></canvas>
+</article>
+
+<!-- Users Table -->
+<article style="margin-top:2rem;">
+  <header>
+    <h3>👥 All Users</h3>
+  </header>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Email</th>
+        <th>Role</th>
+        <th>Created</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for u in users %}
+      <tr>
+        <td>{{ u.id }}</td>
+        <td>{{ u.email }}</td>
+        <td>
+          {% if u.is_admin %}
+            <mark>Admin</mark>
+          {% else %}
+            User
+          {% endif %}
+        </td>
+        <td>{{ u.created_at.strftime("%Y-%m-%d") }}</td>
+        <td>
+          {% if not u.is_admin %}
+            <a href="{{ url_for('delete_user', user_id=u.id) }}"
+               role="button"
+               class="secondary outline"
+               onclick="return confirm('Delete this user?')">🗑 Delete</a>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</article>
+
+<!-- Jobs Table -->
+<article style="margin-top:2rem;">
+  <header>
+    <h3>🖼 All Uploaded Jobs</h3>
+  </header>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>User ID</th>
+        <th>Defects</th>
+        <th>Date</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for j in jobs %}
+      <tr>
+        <td>{{ j.id }}</td>
+        <td>{{ j.user_id }}</td>
+        <td>{{ j.defect_count }}</td>
+        <td>{{ j.created_at.strftime("%Y-%m-%d %H:%M") }}</td>
+        <td>
+          <a href="{{ url_for('results', job_id=j.id) }}" target="_blank" role="button">🔍 View</a>
+          <a href="{{ url_for('delete_job', job_id=j.id) }}" role="button" class="contrast outline"
+             onclick="return confirm('Delete this job?')">🗑 Delete</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</article>
+
+<!-- Chart.js Script -->
+{% raw %}
+<script>
+const labels = {{ users|map(attribute='email')|list|tojson }};
+const data = {
+  labels: labels,
+  datasets: [{
+    label: 'Images Uploaded',
+    data: [
+      {% for u in users %}
+        {{ jobs|selectattr("user_id", "equalto", u.id)|list|length }},
+      {% endfor %}
+    ],
+    backgroundColor: '#3b82f6'
+  }]
+};
+
+new Chart(document.getElementById('uploadsChart'), {
+  type: 'bar',
+  data: data,
+  options: {
+    responsive: true,
+    plugins: { legend: { display: false } },
+    scales: { y: { beginAtZero: true } }
+  }
+});
+</script>
+{% endraw %}
+
+
+{% endblock %}

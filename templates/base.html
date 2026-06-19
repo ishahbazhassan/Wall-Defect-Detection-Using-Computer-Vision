@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Defect Detector{% endblock %}</title>
+  <!-- PicoCSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+  <!-- Chart.js (for admin graphs) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    body {
+      margin: 0 auto;
+      max-width: 1200px;
+      padding: 1rem;
+    }
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+    nav a {
+      margin-left: 0.5rem;
+    }
+    .flash {
+      padding: 0.75rem 1rem;
+      border-radius: 6px;
+      margin-bottom: 1rem;
+    }
+    .flash-success { background: #d1e7dd; color: #0f5132; }
+    .flash-warning { background: #fff3cd; color: #664d03; }
+    .flash-danger  { background: #f8d7da; color: #842029; }
+    table {
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav>
+    <strong><a href="{{ url_for('home') }}" style="text-decoration:none;">🏠 Defect Detector</a></strong>
+    <div>
+      {% if current_user.is_authenticated %}
+        <small>Hello, {{ current_user.email }}</small>
+        {% if current_user.is_admin %}
+          | <a href="{{ url_for('admin_dashboard') }}">Admin</a>
+        {% endif %}
+        | <a href="{{ url_for('logout') }}">Logout</a>
+      {% else %}
+        <a href="{{ url_for('login') }}">Login</a> |
+        <a href="{{ url_for('register') }}">Register</a>
+      {% endif %}
+    </div>
+  </nav>
+
+  <!-- Flash Messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, msg in messages %}
+        <div class="flash flash-{{ category }}">{{ msg }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <!-- Page Content -->
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer style="margin-top:2rem; text-align:center; font-size:0.9rem; color:gray;">
+    &copy; {{ 2025 }} Defect Detector | Built with Flask + PicoCSS
+  </footer>
+
+</body>
+</html>
