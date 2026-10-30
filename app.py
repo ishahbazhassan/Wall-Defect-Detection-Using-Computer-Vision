@@ -24,7 +24,7 @@ from flaskwebgui import FlaskUI
 # Determine BASE_DIR (for both normal & compiled .exe runs)
 # ======================================================
 if getattr(sys, 'frozen', False):
-    BASE_DIR = sys._MEIPASS  # temp dir used by PyInstaller
+    BASE_DIR = sys._MEIPASS 
 else:
     BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
@@ -34,7 +34,6 @@ else:
 app = Flask(__name__)
 app.config.from_object(Config)
 
-# Reconfigure paths (so SQLite and folders work in .exe too)
 app.config["UPLOAD_FOLDER"] = os.path.join(BASE_DIR, "uploads")
 app.config["PROCESSED_FOLDER"] = os.path.join(BASE_DIR, "processed")
 instance_path = os.path.join(BASE_DIR, "instance")
